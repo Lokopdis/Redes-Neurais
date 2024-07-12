@@ -21,3 +21,20 @@ arquivo['style'] = arquivo['style'].apply(lambda x: 1 if x == 'red' else 0 if x 
 
 # Mostrar planilha atualizada
 print(arquivo.head())
+
+# Treinamento
+y = arquivo['style']
+x = arquivo.drop('style', axis=1)
+
+x_Treino, x_Teste, y_Treino, y_Teste = train_test_split(x,y, test_size=0.3)
+
+modelo=ExtraTreesClassifier()
+modelo.fit(x_Treino,y_Treino)
+
+# Testando
+Resultado = modelo.score(x_Teste,y_Teste)
+print("Resultado:", Resultado*100, "%")
+
+arquivo['previsao'] = modelo.predict(x) 
+
+print(arquivo.head())
