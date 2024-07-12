@@ -6,7 +6,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import ExtraTreesClassifier
 
 # Importar planilha
-pd.set_option('display.max_columns', 21)
 arquivo = pd.read_csv('Planilhas de Dados/wine_dataset.csv')
 
 # Mostrar shape da planilha
