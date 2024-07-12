@@ -32,8 +32,7 @@ modelo.fit(x_Treino, y_Treino)
 
 # Testando a Rede
 resultado = modelo.score(x_Teste,y_Teste)
-print("Resultado: ")
-print(resultado*100)
+print("Resultado:",resultado*100,"%")
 
 # Plotando os dados
 plt.scatter(x, y)
