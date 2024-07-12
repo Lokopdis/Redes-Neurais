@@ -35,6 +35,7 @@ modelo.fit(x_Treino,y_Treino)
 Resultado = modelo.score(x_Teste,y_Teste)
 print("Resultado:", Resultado*100, "%")
 
+# Criar coluna de preisão
 arquivo['previsao'] = modelo.predict(x) 
 
 print(arquivo.head())
