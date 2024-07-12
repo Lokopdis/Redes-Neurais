@@ -7,12 +7,6 @@ from sklearn.linear_model import LinearRegression
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-dados = pd.read_csv('kc_house_data.csv')
-plt.figure(figsize=(10,10))
-sns.heatmap(dados.corr())
-plt.show()
-
-'''
 # Importar planilha
 pd.set_option('display.max_columns', 21)
 arquivo = pd.read_csv('Planilhas de Dados/kc_house_data.csv')
@@ -49,4 +43,3 @@ modelo.fit(x_Treino,y_Treino)
 # Etapa de teste
 resultado = modelo.score(x_Teste,y_Teste)
 print("Resultado:",resultado*100, "%" )
-'''
