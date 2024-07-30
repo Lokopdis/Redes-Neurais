@@ -10,7 +10,6 @@ from sklearn.impute import SimpleImputer
 import numpy as np
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
-
 from sklearn.metrics import confusion_matrix
 
 scaler = StandardScaler()
