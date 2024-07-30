@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 
 # Carregar o arquivo CSV
-arquivo = pd.read_csv('Planilhas de Dados/ford.csv')
+arquivo = pd.read_csv('seu dado')
 
 # Listar valores únicos das colunas 'model' e 'transmission'
 unique_models = arquivo['model'].unique()
