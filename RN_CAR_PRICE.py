@@ -4,9 +4,11 @@ from sklearn.linear_model import LinearRegression
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Carregar o arquivo CSV
-arquivo = pd.read_csv('seu dado')
+arquivo = pd.read_csv('Planilhas de Dados/ford.csv')
 
 # Listar valores únicos das colunas 'model' e 'transmission'
 unique_models = arquivo['model'].unique()
@@ -26,6 +28,12 @@ print(arquivo.dtypes)
 
 print("Model Mapping: ", model_mapping)
 print("Transmission Mapping: ", transmission_mapping)
+
+# Plotar o mapa de calor das correlações entre as variáveis
+plt.figure(figsize=(10, 10))
+sns.heatmap(arquivo.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Mapa de Calor das Correlações entre Variáveis')
+plt.show()
 
 # Definindo variáveis de análise
 y = arquivo['price']
