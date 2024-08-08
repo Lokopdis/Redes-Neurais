@@ -15,7 +15,7 @@ from sklearn.metrics import classification_report, accuracy_score
 # Carregar DataSet
 Dados = pd.read_csv('Eduardo_Turcatto_AVA_1_RN/Dados/diabetes_prediction_dataset.csv')
 
-# Análisar dados presentes na Tabela
+# Analisar dados presentes na Tabela
 # Mostrar shape da planilha
 print(Dados.shape)
 
@@ -25,7 +25,11 @@ print(Dados.dtypes)
 # Mostrar planilha
 print(Dados.head())
 
-# Traduzir título das colunas pra facilitar leitura
+# Não há necessidade de remover nenhum item da tabela
+# Em caso de necessidade de remoção de colunas usar o comando:
+# DATA_SET.drop()
+
+# Traduzir título das colunas para facilitar leitura
 # Criar um dicionário para renomear as colunas com tradução para o português
 Novas_Colunas = {
     'gender': 'Gênero',
@@ -40,10 +44,6 @@ Novas_Colunas = {
 }
 
 Dados.rename(columns=Novas_Colunas, inplace=True)
-
-# Não há necessidade de remover nenhum item da tabela
-# Em caso de necessidade de remoção de colunas usar o comando:
-# DATA_SET.drop()
 
 # Definindo variáveis do X e Y para o sistema
 x = Dados.drop(columns=['Diagnóstico'])
@@ -65,6 +65,8 @@ plt.figure(figsize=(10, 8))
 sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
 plt.title('Matriz de Correlação')
 plt.show()
+
+###############################################################
 
 # Definindo etapas de pré-processamento para treinamento da Rede Neural
 # Verificar as colunas categóricas
@@ -109,3 +111,27 @@ pipeline.fit(x_treino, y_treino)
 # Previsão para verificar acurácia do modelo
 y_pred = pipeline.predict(x_teste)
 print("Acurácia:", accuracy_score(y_teste, y_pred) * 100, "%")
+print(classification_report(y_teste, y_pred))
+
+# Gerar novos dados aleatórios
+# Introduzir elemento aleatório para teste
+novos_dados = {
+    'Gênero': np.random.choice(['Male', 'Female']),
+    'Idade': np.random.uniform(18, 100),
+    'Hipertensão': np.random.choice([0, 1]),
+    'Doença_Cardiaca': np.random.choice([0, 1]),
+    'Histórico_de_Fumo': np.random.choice(['never', 'No Info', 'former', 'current', 'ever', 'not current']),
+    'IMC': np.random.uniform(15, 50),
+    'Nível_de_HbA1c': np.random.uniform(3, 15),
+    'Nível_de_Glicose': np.random.uniform(50, 300)
+}
+
+# Converter o indivíduo para DataFrame
+novos_dados_df = pd.DataFrame([novos_dados])
+
+# Fazer previsão para os novos dados
+previsao = pipeline.predict(novos_dados_df)
+
+# Resultados
+print(f"Novo indivíduo: {novos_dados}")
+print(f"Previsão de diabetes: {'Sim' if previsao[0] == 1 else 'Não'}")

@@ -11,12 +11,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import accuracy_score
 
-# Análisar os dados presentar na tabela:
-
-
-
 # Carregar o dataset
-arquivo = pd.read_csv('Eduardo_Turcatto_AVA_1/Dados/diabetes_prediction_dataset.csv')
+arquivo = pd.read_csv('Testes AVA/Dados/diabetes_prediction_dataset.csv')
 
 # Separar as features (X) e o target (y)
 X = arquivo.drop(columns=['diabetes'])

@@ -17,7 +17,7 @@ print(arquivo.dtypes)
 # Mostrar planilha
 print(arquivo.head())
 
-arquivo['style'] = arquivo['style'].apply(lambda x: 1 if x == 'red' else 0 if x == 'white' else x)
+#arquivo['style'] = arquivo['style'].apply(lambda x: 1 if x == 'red' else 0 if x == 'white' else x)
 
 # Mostrar planilha atualizada
 print(arquivo.head())
