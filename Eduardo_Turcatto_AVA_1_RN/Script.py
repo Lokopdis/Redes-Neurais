@@ -111,7 +111,6 @@ pipeline.fit(x_treino, y_treino)
 # Previsão para verificar acurácia do modelo
 y_pred = pipeline.predict(x_teste)
 print("Acurácia:", accuracy_score(y_teste, y_pred) * 100, "%")
-print(classification_report(y_teste, y_pred))
 
 # Gerar novos dados aleatórios
 # Introduzir elemento aleatório para teste
