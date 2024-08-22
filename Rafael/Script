@@ -1,0 +1,144 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from keras import models
+from keras import layers
+from keras import optimizers
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+# Carregar o arquivo CSV com os dados do carro
+Arquivo = pd.read_csv('Rafael/ford (1).csv')
+
+# Remove as colunas "tax" e "mpg" que são irrelevantes para a análise
+Arquivo.drop(['tax', 'mpg'], axis=1, inplace=True)
+
+# Renomeia as colunas para facilitar a interpretação
+Arquivo.rename(columns={'model': 'Modelo',
+                        'year': 'Ano',
+                        'price': 'Preço',
+                        'transmission': 'Transmissão',
+                        'mileage': 'Quilometragem',
+                        'fuelType': 'Combustivel',
+                        'engineSize': 'Litro'}, inplace=True)
+
+# Separa as variáveis de entrada (X) e a variável de saída (y)
+x = Arquivo.drop(columns=['Modelo'])  # X são todas as colunas de entrada, exceto 'Modelo'
+y = Arquivo['Modelo']                 # y é a coluna que queremos prever
+
+# Separa as variáveis categóricas e numéricas para tratamento adequado
+x_categorico = x[['Transmissão', 'Combustivel']]             # Variáveis categóricas
+x_numerico = x.drop(columns=['Transmissão', 'Combustivel'])  # Variáveis numéricas
+
+# Trata os dados faltantes nas variáveis numéricas com a mediana
+x_numerico = x_numerico.fillna(x_numerico.median())  # Imputa valores faltantes com a mediana
+
+# Trata os dados faltantes nas variáveis categóricas com uma constante ('missing')
+x_categorico = x_categorico.fillna('missing')  # Substitui valores faltantes por 'missing'
+
+# Codifica as variáveis categóricas usando pandas get_dummies
+x_categorico_encoded = pd.get_dummies(x_categorico)
+
+# Combina as variáveis numéricas e categóricas codificadas em um único array
+x_novo = np.hstack([x_numerico, x_categorico_encoded])  # Combina os arrays numéricos e categóricos
+
+# Codifica a variável de saída (y) usando pandas get_dummies
+y_encoded = pd.get_dummies(y).values  # Converte para formato one-hot encoding
+
+# Dividir os dados em conjuntos de treino e teste
+indices = np.arange(x_novo.shape[0])
+np.random.shuffle(indices)
+train_size = int(0.70 * len(indices))
+train_indices = indices[:train_size]
+test_indices = indices[train_size:]
+
+x_Treino, x_Teste = x_novo[train_indices], x_novo[test_indices]
+y_Treino, y_Teste = y_encoded[train_indices], y_encoded[test_indices]
+
+# Criar o modelo de rede neural sequencial
+modelo = models.Sequential()
+
+# Adicionar a camada de entrada com 64 neurônios e função de ativação ReLU
+modelo.add(layers.Dense(64, input_dim=x_Treino.shape[1], activation='relu'))
+
+# Adicionar uma camada oculta com 32 neurônios e função de ativação ReLU
+modelo.add(layers.Dense(32, activation='relu'))
+
+# Adicionar a camada de saída com número de neurônios igual ao número de classes e função de ativação softmax
+modelo.add(layers.Dense(y_Treino.shape[1], activation='softmax'))
+
+# Compilar o modelo com otimizador SGD, função de perda categorical_crossentropy, e a métrica de acurácia
+otimizador = optimizers.SGD()
+modelo.compile(optimizer=otimizador, loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Treinar o modelo
+historia = modelo.fit(x_Treino, y_Treino, epochs=20, batch_size=32, validation_data=(x_Teste, y_Teste), verbose=1)
+
+# Avaliar o modelo com os dados de teste
+resultado = modelo.evaluate(x_Teste, y_Teste, verbose=0)
+print("\n\nAcurácia")  
+print("Resultado:", resultado[1] * 100, "%")  # Exibe a acurácia como uma porcentagem
+
+# Faz previsões no conjunto de teste
+y_pred = modelo.predict(x_Teste)
+y_pred_classes = np.argmax(y_pred, axis=1)  # Converte as previsões para a classe mais provável
+y_true = np.argmax(y_Teste, axis=1)         # Converte os rótulos verdadeiros para a classe
+
+# Gera e exibe a matriz de confusão para avaliar o desempenho do modelo
+cm = confusion_matrix(y_true, y_pred_classes)  # Calcula a matriz de confusão
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)  # Configura a exibição da matriz
+disp.plot()  # Plota a matriz de confusão
+plt.show()  # Exibe a matriz de confusão
+
+# Testando o modelo com um novo indivíduo aleatório gerado a partir dos dados existentes
+
+# Seleciona valores aleatórios para cada característica
+novo_ano = np.random.choice(Arquivo['Ano'])
+novo_preco = np.random.choice(Arquivo['Preço'])
+nova_quilometragem = np.random.choice(Arquivo['Quilometragem'])
+novo_litro = np.random.choice(Arquivo['Litro'])
+nova_transmissao = np.random.choice(Arquivo['Transmissão'])
+novo_combustivel = np.random.choice(Arquivo['Combustivel'])
+
+# Cria um dicionário com os novos valores
+novos_dados = {
+    'Ano': novo_ano,
+    'Preço': novo_preco,
+    'Quilometragem': nova_quilometragem,
+    'Litro': novo_litro,
+    'Transmissão': nova_transmissao,
+    'Combustivel': novo_combustivel
+}
+
+# Converte o dicionário para um DataFrame
+novos_dados_df = pd.DataFrame([novos_dados])
+
+# Aplica a mesma imputação e transformação usadas nos dados de treino para os novos dados
+novos_dados_df[['Ano', 'Preço', 'Quilometragem', 'Litro']] = novos_dados_df[['Ano', 'Preço', 'Quilometragem', 'Litro']].fillna(x_numerico.median())
+novos_dados_df[['Transmissão', 'Combustivel']] = novos_dados_df[['Transmissão', 'Combustivel']].fillna('missing')
+encoded_novos_dados = pd.get_dummies(novos_dados_df[['Transmissão', 'Combustivel']])
+
+# Garantir que as colunas codificadas estão na mesma ordem que no treinamento
+encoded_novos_dados = encoded_novos_dados.reindex(columns=x_categorico_encoded.columns, fill_value=0)
+
+# Combina os dados numéricos e categóricos em um único DataFrame
+novos_dados_processed = np.hstack([
+    novos_dados_df[['Ano', 'Preço', 'Quilometragem', 'Litro']].values,
+    encoded_novos_dados.values
+])
+
+# Converte para float32 para compatibilidade com o modelo
+novos_dados_processed = novos_dados_processed.astype(np.float32)
+
+# Faz a previsão do tipo de carro baseado nos novos dados
+previsao = modelo.predict(novos_dados_processed)
+previsao_classes = np.argmax(previsao, axis=1)
+
+# Mapeia os índices de volta para os nomes dos modelos
+modelos = Arquivo['Modelo'].unique()  # Obtém os nomes dos modelos únicos
+previsao_modelo = modelos[previsao_classes[0]]
+
+print("\n\nPrevisão do tipo de carro baseado nos novos dados")  
+print(f"Novo indivíduo: {novos_dados}")  # Exibe os valores do novo indivíduo
+print(f"Previsão de tipo de carro: {previsao_modelo}")  # Exibe a previsão do modelo
