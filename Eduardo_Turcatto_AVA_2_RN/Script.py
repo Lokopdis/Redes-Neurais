@@ -6,6 +6,8 @@ from keras import layers
 from keras import optimizers
 import warnings
 
+from sklearn.metrics import confusion_matrix, classification_report
+
 warnings.filterwarnings('ignore')
 
 # Carregar o dataset
@@ -72,11 +74,29 @@ otimizador = optimizers.SGD()
 modelo.compile(loss='categorical_crossentropy', optimizer=otimizador, metrics=['acc'])
 
 # Treinar o modelo
-modelo.fit(x_treino, y_treino, epochs=20, batch_size=105, validation_data=(x_teste, y_teste), verbose=1)
+modelo.fit(x_treino, y_treino, epochs=100, batch_size=105, validation_data=(x_teste, y_teste), verbose=1)
 
 # Avaliar o modelo
 resultado = modelo.evaluate(x_teste, y_teste, verbose=0)
 print(f"\nAcurácia no conjunto de teste: {resultado[1] * 100:.2f}%")
+
+# Matriz de Confusão
+# Fazer previsões no conjunto de teste
+y_pred = modelo.predict(x_teste)
+
+# Converter previsões de probabilidades para rótulos (classes)
+y_pred_classes = np.argmax(y_pred, axis=1)
+y_true = np.argmax(y_teste, axis=1)
+
+# Matriz de confusão
+matriz_confusao = confusion_matrix(y_true, y_pred_classes)
+print("\nMatriz de Confusão:")
+print(matriz_confusao)
+
+# Relatório de classificação
+print("\nRelatório de Classificação:")
+print(classification_report(y_true, y_pred_classes))
+
 
 # Fazer previsão para novos dados
 novos_dados = {
